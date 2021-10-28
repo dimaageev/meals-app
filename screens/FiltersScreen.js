@@ -65,7 +65,7 @@ const FiltersScreen = (props) => {
         </View>
       ),
     });
-  });
+  }, [props.navigation, props.route.params]);
 
   return (
     <View style={styles.screen}>
