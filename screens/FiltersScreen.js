@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { StyleSheet, Switch, Text, View } from "react-native";
 import HeaderButton from "../components/HeaderButton";
 import colors from "../consts/colors";
-// import { LogBox } from "react-native";
+import { LogBox } from "react-native";
+import { useDispatch } from "react-redux";
+import { setFilters } from "../store/actions/meals";
 
-// LogBox.ignoreLogs([
-//   "Non-serializable values were found in the navigation state",
-// ]);
+LogBox.ignoreLogs([
+  "Non-serializable values were found in the navigation state",
+]);
 
 const FilterSwitch = (props) => {
   return (
@@ -28,6 +30,8 @@ const FiltersScreen = (props) => {
   const [isVegan, setIsVegan] = useState(false);
   const [isVegetarian, setIsVegetarian] = useState(false);
 
+  const dispatch = useDispatch();
+
   const saveFilters = React.useCallback(() => {
     const appliedFilters = {
       glutenFree: isGlutenFree,
@@ -36,8 +40,8 @@ const FiltersScreen = (props) => {
       vegetarian: isVegetarian,
     };
 
-    console.log(appliedFilters);
-  }, [isGlutenFree, isLactoseFree, isVegan, isVegetarian]);
+    dispatch(setFilters(appliedFilters));
+  }, [isGlutenFree, isLactoseFree, isVegan, isVegetarian, dispatch]);
 
   React.useEffect(() => {
     props.navigation.setParams({

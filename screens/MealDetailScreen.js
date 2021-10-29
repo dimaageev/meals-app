@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
+import { useDispatch, useSelector } from "react-redux";
 import HeaderButton from "../components/HeaderButton";
-import { MEALS } from "../data/dummy-data";
+import { toggleFavorite } from "../store/actions/meals";
 
 const ListItem = (props) => {
   return (
@@ -15,21 +16,44 @@ const ListItem = (props) => {
 const MealDetailsScreen = (props) => {
   const mealId = props.route.params.mealId;
 
-  const selectedMeal = MEALS.find((meal) => meal.id === mealId);
+  const availableMeals = useSelector((state) => state.meals.meals);
+  const currentMealIsFavorite = useSelector((state) =>
+    state.meals.favoriteMeals.some((meal) => meal.id === mealId)
+  );
+
+  const selectedMeal = availableMeals.find((meal) => meal.id === mealId);
+
+  const dispatch = useDispatch();
+  const toggleFavoriteHandler = useCallback(() => {
+    dispatch(toggleFavorite(mealId));
+  }, [dispatch, mealId]);
+
+  React.useEffect(() => {
+    props.navigation.setParams({
+      toggleFav: toggleFavoriteHandler,
+    });
+  }, [props.navigation, toggleFavoriteHandler]);
+
+  React.useEffect(() => {
+    props.navigation.setParams({
+      isFav: currentMealIsFavorite,
+    });
+  }, [props.navigation, currentMealIsFavorite]);
 
   React.useLayoutEffect(() => {
+    const toggleFavorites = props.route.params.toggleFav;
+    const isFavorite = props.route.params.isFav;
+
     props.navigation.setOptions({
       headerTitle: selectedMeal.title,
       headerRight: () => (
         <HeaderButton
-          iconName="ios-star"
-          onPress={() => {
-            console.log("Added to favorites");
-          }}
+          iconName={isFavorite ? "ios-star" : "ios-star-outline"}
+          onPress={toggleFavorites}
         />
       ),
     });
-  }, [props.navigation]);
+  }, [props.navigation, props.route.params]);
 
   return (
     <ScrollView>
